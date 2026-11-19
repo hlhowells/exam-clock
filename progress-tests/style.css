@@ -1,0 +1,142 @@
+/* Alway Progress Tests – link pages for the Exam Clock */
+
+:root {
+  --bg: #f4f6fa;
+  --surface: #ffffff;
+  --fg: #111827;
+  --muted: #5b6475;
+  --line: #d9dfe8;
+  --accent: #0b5cad;
+  --accent-fg: #ffffff;
+  --accent-hover: #094c90;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 4px 14px rgba(16, 24, 40, .06);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1117;
+    --surface: #161b24;
+    --fg: #e8ecf2;
+    --muted: #9aa4b5;
+    --line: #2a3342;
+    --accent: #3f8fdc;
+    --accent-fg: #ffffff;
+    --accent-hover: #2f7cc6;
+    --shadow: none;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.4;
+  -webkit-tap-highlight-color: transparent;
+}
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+h1 {
+  font-size: clamp(28px, 4vw, 44px);
+  margin: 0 0 8px;
+  letter-spacing: -.01em;
+}
+.lead { color: var(--muted); font-size: 18px; margin: 0 0 28px; }
+.back {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 8px 0;
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 17px;
+}
+.back:hover { text-decoration: underline; }
+a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+/* hub */
+.cards { display: grid; gap: 16px; max-width: 720px; }
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 92px;
+  padding: 20px 28px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  color: var(--fg);
+  text-decoration: none;
+  font-size: clamp(20px, 2.6vw, 28px);
+  font-weight: 700;
+}
+.card:hover { border-color: var(--accent); }
+.card .arrow { color: var(--accent); font-size: 1.2em; }
+
+/* year group pages */
+.days {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+.day { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.day h2 {
+  margin: 0 0 2px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--line);
+  font-size: clamp(20px, 2.4vw, 28px);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.day h2 small { font-size: .6em; font-weight: 600; color: var(--muted); }
+
+.session {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-height: 110px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  text-decoration: none;
+  box-shadow: var(--shadow);
+  touch-action: manipulation;
+}
+.session:hover { background: var(--accent-hover); }
+.session:active { transform: translateY(1px); }
+.session b { font-size: clamp(22px, 2.6vw, 30px); }
+.session small { font-size: 15px; opacity: .9; overflow-wrap: anywhere; }
+.session.empty { background: transparent; box-shadow: none; border: 2px dashed var(--line); }
+
+/* large touchscreens: make everything bigger and use the full height */
+@media (min-width: 1400px) {
+  main { max-width: 1700px; padding: 4vh 4vw; }
+  h1 { font-size: 5.2vh; }
+  .lead { font-size: 2.6vh; }
+  .back { font-size: 2.4vh; }
+  .cards { max-width: 1100px; gap: 2.4vh; }
+  .card { min-height: 15vh; font-size: 4vh; padding: 0 3vw; border-radius: 2vh; }
+  .days { gap: 2vw; margin-top: 3vh; }
+  .day { gap: 2.2vh; }
+  .day h2 { font-size: 3.8vh; }
+  .session { min-height: 18vh; padding: 2vh 1.6vw; border-radius: 2vh; }
+  .session b { font-size: 4.4vh; }
+  .session small { font-size: 2.3vh; }
+}
+
+@media (max-width: 760px) {
+  main { padding: 20px 16px 40px; }
+  .days { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .session { min-height: 88px; }
+  .session.empty { display: none; }
+}
