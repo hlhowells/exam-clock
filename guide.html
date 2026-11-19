@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exam Clock Guide</title>
+<style>
+  :root { --fg: #111827; --muted: #4b5563; --line: #d9dee7; --accent: #0b5cad; --bg: #ffffff; --soft: #f3f6fa; }
+  @media (prefers-color-scheme: dark) {
+    :root { --fg: #e8ecf2; --muted: #a3acbb; --line: #2b3443; --accent: #5aa8f0; --bg: #0d1117; --soft: #161b24; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 16px; line-height: 1.55;
+  }
+  main { max-width: 820px; margin: 0 auto; padding: 32px 16px 48px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 20px; margin: 28px 0 8px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .lead { color: var(--muted); margin-top: 0; }
+  li { margin-bottom: 6px; }
+  .box { background: var(--soft); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin: 12px 0; }
+  .box.warn { border-left: 4px solid #d97706; }
+  b.btnname { white-space: nowrap; }
+  a { color: var(--accent); }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+  td, th { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--soft); }
+  .print { float: right; }
+  @media print {
+    :root { --fg: #000; --muted: #333; --line: #bbb; --bg: #fff; --soft: #f2f2f2; }
+    .print { display: none; }
+    main { padding: 0; }
+    h2 { break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <button class="print" type="button" onclick="window.print()">Print</button>
+  <h1>Exam Clock: how to use it</h1>
+  <p class="lead">For exams officers and invigilators.</p>
+
+  <h2>1. Before the exam (on your laptop)</h2>
+  <ol>
+    <li>Open the <a href="index.html">Exam Clock library</a> and click <b>+ New display</b>.</li>
+    <li>Fill in the date, centre name and number, room and any notes for the bottom of the screen.</li>
+    <li>For each exam, enter the subject, board, paper code, <b>planned start</b> and <b>duration</b>.</li>
+    <li>Each exam has a list of <b>finish times</b>. By default there is a normal finish and a +25% finish. Add +50%, +100% or any other percentage you need.
+      Tick <b>Rest breaks</b> on a finish time for candidates who have supervised rest breaks: they get their own Start/End rest break button on the day.</li>
+    <li>Check the preview on the right. Extra time finishes are rounded <b>up</b> to the next whole minute (e.g. 1h 30m + 25% = 1h 53m).</li>
+    <li>Click <b>Link &amp; QR code for the exam screen</b> and send the link to the smartboard (see section 2).</li>
+  </ol>
+  <div class="box">Everything saves automatically in your laptop&rsquo;s browser. Use <b>Export library</b> now and then to keep a backup file.
+    If you edit a display after sending its link, send the new link: the link contains the whole exam setup.</div>
+
+  <h2>2. Getting it onto the smartboard</h2>
+  <p>Any of these will work:</p>
+  <ul>
+    <li><b>Email the link</b> to yourself and open it in the smartboard&rsquo;s browser. Bookmark it, e.g. &ldquo;Mon AM Sports Hall&rdquo;.</li>
+    <li>Paste the link into a shared document (OneDrive, Google Drive, Teams) that you can open on the smartboard.</li>
+    <li>Open the <b>library</b> on the smartboard itself, <b>Import</b> your exported library file, then choose a display and press <b>Open the display here</b>.</li>
+  </ul>
+
+  <h2>3. On the day</h2>
+  <ol>
+    <li>Open the display link on the smartboard. Tap the <b>full screen</b> button in the bottom-left corner.</li>
+    <li>Check the clock matches the hall clock or your phone.</li>
+    <li>To open the <b>invigilator controls</b>, <b>press and hold the lock</b> in the bottom-right corner for one second. A quick tap does nothing, so candidates can&rsquo;t change anything by accident.</li>
+  </ol>
+
+  <table>
+    <tr><th>Button</th><th>What it does</th></tr>
+    <tr><td><b class="btnname">Start now</b></td><td>Use when you say &ldquo;you may begin&rdquo;. The start time is set to the <b>next whole minute</b> (so nobody loses time) and every finish time for that exam updates.</td></tr>
+    <tr><td><b class="btnname">&minus;1 min / +1 min</b></td><td>Nudge the start time if it needs correcting.</td></tr>
+    <tr><td><b class="btnname">Back to planned</b></td><td>Undo any start time changes for that exam.</td></tr>
+    <tr><td><b class="btnname">Start / End rest break</b></td><td>Stops and restarts the clock for that finish time only. Its finish time moves later by the length of the break. The screen shows &ldquo;On rest break&rdquo; while it is running.</td></tr>
+    <tr><td><b class="btnname">Emergency pause</b></td><td>For an evacuation or other emergency. Stops every exam in progress; a red &ldquo;CLOCK STOPPED&rdquo; banner shows how long. Press <b>Restart clocks</b> when candidates resume: all finish times move later by the length of the pause.</td></tr>
+    <tr><td><b class="btnname">Event log</b></td><td>Every change with its time. Copy it into your incident records after the exam.</td></tr>
+    <tr><td><b class="btnname">Clear today&rsquo;s changes</b></td><td>Goes back to the planned times and clears the log. Only use this before an exam starts, or after you have copied the log.</td></tr>
+  </table>
+  <div class="box">If the page is reloaded or the smartboard restarts, open the same link again: start times, breaks and pauses from today are remembered on that smartboard.</div>
+
+  <h2>4. Smartboard set-up checklist (do this once)</h2>
+  <div class="box warn">A web page cannot stop the smartboard&rsquo;s own power saving. Please check these settings in the panel&rsquo;s settings menu.</div>
+  <ul>
+    <li><b>Sleep / screen off / eco mode:</b> turn off, or set longer than your longest exam session.</li>
+    <li><b>Date &amp; time:</b> set to automatic (network time) and the UK time zone, so the clock is accurate.</li>
+    <li><b>Browser:</b> open the Exam Clock once while connected to the internet so it is saved for offline use.</li>
+    <li><b>Test:</b> leave a display running for a full session length before the real exam season.</li>
+  </ul>
+
+  <h2>5. Troubleshooting</h2>
+  <ul>
+    <li><b>&ldquo;Check: this display was set up for &hellip;&rdquo;</b> appears when the display&rsquo;s date isn&rsquo;t today. Times are still shown for today; check you opened the right link.</li>
+    <li><b>Text is too small</b> with many exams: the text shrinks to fit everything. Split exams across two displays if needed.</li>
+    <li><b>The link doesn&rsquo;t open on the smartboard:</b> make sure the whole link was copied (it is long).</li>
+  </ul>
+</main>
+</body>
+</html>

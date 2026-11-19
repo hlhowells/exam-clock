@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#05070d">
+<title>Exam Clock</title>
+<link rel="stylesheet" href="css/display.css">
+</head>
+<body>
+
+<div id="app" hidden>
+  <header class="d-header">
+    <div id="centre"></div>
+    <div id="roomDate"></div>
+  </header>
+  <div id="dateWarn" class="date-warn" hidden></div>
+  <div id="banner" class="banner" hidden>
+    CLOCK STOPPED &ndash; EXAMS PAUSED
+    <small>Stopped for <span id="bannerTime">0:00</span>. Finish times will move later by this amount.</small>
+  </div>
+  <div class="d-clock" id="clock"><span id="clockHM">--:--</span><span class="sec" id="clockS">:--</span></div>
+  <main id="exams" class="d-exams"></main>
+  <footer id="notes" class="d-notes" hidden></footer>
+
+  <button id="fsBtn" class="corner-btn fs-btn" type="button" aria-label="Full screen">
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+  </button>
+  <button id="lockBtn" class="corner-btn lock-btn" type="button" aria-label="Invigilator controls (press and hold)">
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+  </button>
+</div>
+
+<div id="empty" class="empty" hidden>
+  <h1>Exam Clock</h1>
+  <p>No exam display is loaded.</p>
+  <p>Open a display link from the library, or <a href="index.html">open the display library</a> on this device.</p>
+</div>
+
+<!-- Invigilator controls -->
+<div id="controls" class="overlay" hidden>
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Invigilator controls</h2>
+      <button class="btn" type="button" data-act="close">Close</button>
+    </div>
+
+    <button id="emBtn" class="btn big danger" type="button" data-act="emergency">Emergency pause &ndash; stop all clocks</button>
+
+    <div id="ctlExams"></div>
+
+    <details class="ctl-log">
+      <summary>Event log (for incident records)</summary>
+      <pre id="logText"></pre>
+      <div class="btns">
+        <button class="btn" type="button" data-act="copylog">Copy log</button>
+      </div>
+    </details>
+
+    <div class="btns ctl-foot">
+      <button class="btn" type="button" data-act="fullscreen">Full screen</button>
+      <button class="btn" type="button" data-act="resetday">Clear today&rsquo;s changes</button>
+    </div>
+    <p class="muted small">Controls close automatically after 2 minutes without a tap.</p>
+  </div>
+</div>
+
+<div id="confirm" class="overlay modal" hidden>
+  <div class="panel narrow">
+    <h2 id="cfTitle"></h2>
+    <p id="cfText"></p>
+    <div class="btns end">
+      <button class="btn" type="button" id="cfNo">Cancel</button>
+      <button class="btn primary" type="button" id="cfYes">OK</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="js/core.js"></script>
+<script src="js/display.js"></script>
+</body>
+</html>
