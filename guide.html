@@ -47,10 +47,22 @@
     <li>Open the <a href="index.html">Exam Clock library</a> and click <b>+ New display</b>.</li>
     <li>Fill in the date, centre name and number, room and any notes for the bottom of the screen.</li>
     <li>For each exam, enter the subject, board, paper code, <b>planned start</b> and <b>duration</b>.</li>
-    <li>Each exam has a list of <b>finish times</b>. By default there is a normal finish and a +25% finish. Add +50%, +100% or any other percentage you need.
+    <li>Each exam has a list of <b>finish times</b>. By default there is a normal finish and an extra time (+25%) finish. On screen these are labelled <i>Finish</i> and <i>Extra time</i>; the percentage is shown only when an exam has more than one extra time finish. Add +50%, +100% or any other percentage you need.
       Tick <b>Rest breaks</b> on a finish time for candidates who have supervised rest breaks: they get their own Start/End rest break button on the day.</li>
     <li>Check the preview on the right. Extra time finishes are rounded <b>up</b> to the next whole minute (e.g. 1h 30m + 25% = 1h 53m).</li>
     <li>Click <b>Link &amp; QR code for the exam screen</b> and send the link to the smartboard (see section 2).</li>
+  </ol>
+  <h3>Creating many displays at once from a spreadsheet</h3>
+  <ol>
+    <li>In the library, click <b>Create displays from CSV</b>, then <b>Download template</b>.</li>
+    <li>Open the template in Excel and fill in one row per exam: Display, Date, Room, Subject, Board, Paper code, Start, Duration, Extra time, Rest breaks. Only <b>Start</b> and <b>Duration</b> are required.
+      <ul>
+        <li>Rows with the same <b>Display</b> name and date go on one screen. Leave Display blank to group exams by date, room and morning/afternoon automatically.</li>
+        <li><b>Extra time</b>: percentages, e.g. <i>25</i>, or <i>25;50</i> for two extra time finishes. <b>Rest breaks</b>: e.g. <i>0</i> or <i>25</i>.</li>
+      </ul>
+    </li>
+    <li>Save it as <b>CSV UTF-8</b> (<i>File &rarr; Save As</i>), then choose the file. Check the preview, fix any rows it lists as skipped, and click <b>Create displays</b>.</li>
+    <li>Importing a display with the same name and date as an existing one replaces it, so you can re-import an updated timetable.</li>
   </ol>
   <div class="box">Everything saves automatically in your laptop&rsquo;s browser. Use <b>Export library</b> now and then to keep a backup file.
     If you edit a display after sending its link, send the new link: the link contains the whole exam setup.</div>
@@ -67,6 +79,7 @@
   <ol>
     <li>Open the display link on the smartboard. Tap the <b>full screen</b> button in the bottom-left corner.</li>
     <li>Check the clock matches the hall clock or your phone.</li>
+    <li>When you say &ldquo;you may begin&rdquo;, tap the green <b>Start all exams</b> button under the clock and confirm. Every exam&rsquo;s start time is set to the next whole minute and the button disappears. If you have already started some exams from the controls, it says <b>Start remaining exams</b>.</li>
     <li>To open the <b>invigilator controls</b>, <b>press and hold the lock</b> in the bottom-right corner for one second. A quick tap does nothing, so candidates can&rsquo;t change anything by accident.</li>
   </ol>
 

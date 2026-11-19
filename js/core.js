@@ -174,11 +174,18 @@
     };
   };
 
-  EC.rowLabel = function (r) {
-    var parts = [];
-    if (r.pct > 0) parts.push('+' + EC.fmtPct(r.pct) + '%');
-    if (r.rest) parts.push('rest breaks');
-    return parts.length ? 'Finish (' + parts.join(', ') + ')' : 'Finish';
+  // Default label for a finish row: "Finish", "Extra time (+25%)", "Rest breaks"...
+  // The percentage is only shown when the exam uses more than one extra-time percentage.
+  EC.rowLabel = function (r, ex) {
+    var pcts = [];
+    ((ex && ex.rows) || [r]).forEach(function (x) {
+      if (x.pct > 0 && pcts.indexOf(x.pct) < 0) pcts.push(x.pct);
+    });
+    if (r.pct > 0) {
+      var s = 'Extra time' + (pcts.length > 1 ? ' (+' + EC.fmtPct(r.pct) + '%)' : '');
+      return r.rest ? s + ' + rest breaks' : s;
+    }
+    return r.rest ? 'Rest breaks' : 'Finish';
   };
 
   /* ---------- data model ---------- */

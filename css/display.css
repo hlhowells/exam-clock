@@ -101,11 +101,28 @@ html, body {
   letter-spacing: -.01em;
 }
 body.busy .d-clock { font-size: 16vh; margin: 1vh 0 1.6vh; }
-.d-clock .sec {
-  font-size: .42em;
-  color: var(--muted);
-  font-weight: 600;
+
+.start-all-wrap {
+  display: flex;
+  justify-content: center;
+  margin: -.6vh 0 2.2vh;
 }
+.start-all {
+  font: inherit;
+  font-size: 4.4vh;
+  font-weight: 800;
+  padding: 1.4vh 5vw;
+  border: 0;
+  border-radius: 1.4vh;
+  background: #1b7f3b;
+  color: #fff;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 .6vh 2vh rgba(0, 0, 0, .35);
+}
+.start-all:active { transform: translateY(2px); filter: brightness(.95); }
+body.busy .start-all { font-size: 3.4vh; padding: 1vh 4vw; }
+body.busy .start-all-wrap { margin-bottom: 1.6vh; }
 
 .d-exams {
   flex: 1 1 auto;

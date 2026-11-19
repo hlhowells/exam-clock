@@ -170,7 +170,7 @@
       '<table class="rows"><thead><tr><th>Label on screen</th><th>Extra time %</th><th class="center">Rest breaks</th><th>Planned finish</th><th></th></tr></thead><tbody>';
     ex.rows.forEach(function (r, ri) {
       h += '<tr data-row="' + ri + '">' +
-        '<td><input type="text" data-rf="label" value="' + esc(r.label) + '" placeholder="' + esc(EC.rowLabel(r)) + '" aria-label="Label on screen"></td>' +
+        '<td><input type="text" data-rf="label" value="' + esc(r.label) + '" placeholder="' + esc(EC.rowLabel(r, ex)) + '" aria-label="Label on screen"></td>' +
         '<td><input class="pct" type="number" min="0" max="400" step="any" data-rf="pct" value="' + EC.fmtPct(r.pct) + '" aria-label="Extra time percent"></td>' +
         '<td class="center"><input type="checkbox" data-rf="rest"' + (r.rest ? ' checked' : '') + ' aria-label="Has rest breaks" title="Adds Start/End rest break buttons on the screen for this finish time"></td>' +
         '<td class="fin" data-fin></td>' +
@@ -210,7 +210,7 @@
         fin.className = 'fin' + (r.rest ? ' rest' : r.pct > 0 ? ' extra' : '');
         fin.innerHTML = esc(EC.fmtFinish(start + mins * EC.MIN)) + ' <small>(' + esc(EC.fmtDur(mins)) +
           (r.rest ? ' + breaks' : '') + ')</small>';
-        tr.querySelector('[data-rf="label"]').placeholder = EC.rowLabel(r);
+        tr.querySelector('[data-rf="label"]').placeholder = EC.rowLabel(r, ex);
       });
     });
   }
@@ -301,6 +301,9 @@
         if (nameInput) { nameInput.focus(); nameInput.select(); }
         return;
       }
+      case 'import-csv':
+        openCsv();
+        return;
       case 'add-exam': {
         var last = d.exams[d.exams.length - 1];
         var ne = EC.newExam(last ? last.start : '09:00');
@@ -401,7 +404,9 @@
 
   $('closeShare').addEventListener('click', function () { $('share').hidden = true; });
   $('share').addEventListener('click', function (e) { if (e.target === $('share')) $('share').hidden = true; });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') $('share').hidden = true; });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { $('share').hidden = true; $('csvModal').hidden = true; }
+  });
   $('linkInput').addEventListener('focus', function () { this.select(); });
   $('copyLink').addEventListener('click', function () {
     var text = $('linkInput').value;
@@ -414,6 +419,133 @@
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(text).then(function () { toast('Link copied.'); }, fallback);
     } else fallback();
+  });
+
+  /* ---------- create displays from CSV ---------- */
+
+  var csvRows = null, csvResult = null;
+
+  function sameDisplay(a, b) {
+    return (a.name || '').trim().toLowerCase() === (b.name || '').trim().toLowerCase() && a.date === b.date;
+  }
+  function existingFor(d) {
+    for (var i = 0; i < lib.displays.length; i++) if (sameDisplay(lib.displays[i], d)) return lib.displays[i];
+    return null;
+  }
+
+  function openCsv() {
+    csvRows = null;
+    csvResult = null;
+    $('csvFile').value = '';
+    $('csvFileName').textContent = '';
+    // Pre-fill the centre from the most recently edited display that has one.
+    var withCentre = lib.displays.filter(function (d) { return d.centre || d.centreNo; })
+      .sort(function (a, b) { return (b.updated || 0) - (a.updated || 0); })[0];
+    $('csvCentre').value = withCentre ? withCentre.centre : '';
+    $('csvCentreNo').value = withCentre ? withCentre.centreNo : '';
+    renderCsv();
+    $('csvModal').hidden = false;
+  }
+
+  function closeCsv() { $('csvModal').hidden = true; }
+
+  function finishSummary(ex) {
+    var parts = ex.rows.slice(1).map(function (r) {
+      return (r.rest ? 'rest breaks' + (r.pct ? ' +' + EC.fmtPct(r.pct) + '%' : '') : '+' + EC.fmtPct(r.pct) + '%');
+    });
+    return parts.length ? ' – ' + parts.join(', ') : '';
+  }
+
+  function renderCsv() {
+    var box = $('csvResult'), btn = $('csvImport');
+    btn.disabled = true;
+    btn.textContent = 'Create displays';
+    if (!csvRows) { box.innerHTML = ''; return; }
+
+    csvResult = EC.csv.convert(csvRows, { centre: $('csvCentre').value.trim(), centreNo: $('csvCentreNo').value.trim() });
+    if (csvResult.error) {
+      box.innerHTML = '<p class="csv-error">' + esc(csvResult.error) + '</p>';
+      return;
+    }
+    var ds = csvResult.displays, h = '';
+    if (ds.length) {
+      var replacing = ds.filter(existingFor).length;
+      h += '<h3>' + ds.length + ' display' + (ds.length === 1 ? '' : 's') + ', ' + csvResult.examCount + ' exam' +
+        (csvResult.examCount === 1 ? '' : 's') + (replacing ? ' – ' + replacing + ' will replace a display with the same name and date' : '') + '</h3>';
+      h += '<div class="csv-list">' + ds.map(function (d) {
+        return '<div class="csv-item"><b>' + esc(d.name) + '</b>' +
+          '<small>' + esc([EC.fmtDateShort(d.date), d.room].filter(Boolean).join(' · ')) + '</small>' +
+          (existingFor(d) ? '<br><span class="pill">Replaces existing</span>' : '') +
+          '<ul>' + d.exams.map(function (ex) {
+            return '<li>' + esc(ex.start + ' ' + (ex.subject || 'Exam') + ' (' + EC.fmtDur(ex.dur) + ')' + finishSummary(ex)) + '</li>';
+          }).join('') + '</ul></div>';
+      }).join('') + '</div>';
+    } else {
+      h += '<p class="csv-error">No exams could be read from this file.</p>';
+    }
+    if (csvResult.errors.length) {
+      h += '<div class="csv-errors"><b>' + csvResult.errors.length + ' row' + (csvResult.errors.length === 1 ? '' : 's') +
+        ' skipped</b> – fix these in the spreadsheet and choose the file again:<ul>' +
+        csvResult.errors.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul></div>';
+    }
+    box.innerHTML = h;
+    if (ds.length) {
+      btn.disabled = false;
+      btn.textContent = 'Create ' + ds.length + ' display' + (ds.length === 1 ? '' : 's');
+    }
+  }
+
+  $('csvFile').addEventListener('change', function () {
+    var file = this.files && this.files[0];
+    if (!file) return;
+    $('csvFileName').textContent = file.name;
+    var reader = new FileReader();
+    reader.onload = function () {
+      csvRows = EC.csv.parse(reader.result);
+      renderCsv();
+    };
+    reader.onerror = function () { alert('That file could not be read.'); };
+    reader.readAsText(file);
+  });
+  $('csvCentre').addEventListener('input', renderCsv);
+  $('csvCentreNo').addEventListener('input', renderCsv);
+  $('csvCancel').addEventListener('click', closeCsv);
+  $('csvModal').addEventListener('click', function (e) { if (e.target === $('csvModal')) closeCsv(); });
+
+  $('csvTemplate').addEventListener('click', function () {
+    var blob = new Blob([EC.csv.template()], { type: 'text/csv' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'exam-clock-template.csv';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  });
+
+  $('csvImport').addEventListener('click', function () {
+    if (!csvResult || !csvResult.displays || !csvResult.displays.length) return;
+    var now = Date.now(), firstId = null, added = 0, replaced = 0;
+    csvResult.displays.forEach(function (d) {
+      var old = existingFor(d);
+      d.updated = now;
+      if (old) {
+        d.id = old.id;          // keep the same display so the screen's on-the-day state lines up
+        d.theme = old.theme;
+        lib.displays[lib.displays.indexOf(old)] = d;
+        replaced++;
+      } else {
+        lib.displays.push(d);
+        added++;
+      }
+      if (!firstId) firstId = d.id;
+    });
+    saveNow();
+    closeCsv();
+    select(firstId);
+    var msg = [];
+    if (added) msg.push('Created ' + added + ' display' + (added === 1 ? '' : 's'));
+    if (replaced) msg.push((added ? 'replaced ' : 'Replaced ') + replaced + ' display' + (replaced === 1 ? '' : 's'));
+    toast(msg.join(', ') + '.');
   });
 
   /* ---------- export / import ---------- */

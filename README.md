@@ -3,7 +3,8 @@
 A web app for showing exam times on a large touchscreen at the front of an exam hall.
 
 - **Library and editor** (`index.html`): create and save displays on your laptop. Each display has its exams, planned start times, and finish times for normal time, any percentage of extra time, and rest breaks.
-- **Display** (`display.html`): a large 24-hour clock with each exam's start and finish times. Touch controls open when you press and hold the lock button: **Start now**, start adjustments, **rest break pause/resume**, **emergency pause** and an event log.
+- **Create displays from CSV**: build many displays at once from a spreadsheet with one row per exam. There's a downloadable template, and you can preview the result and see any rows it couldn't read before anything is created.
+- **Display** (`display.html`): a large 24-hour clock (hh:mm) with each exam's start and finish times. A green **Start all exams** button shows until the exams are started. Touch controls open when you press and hold the lock button: **Start now**, start adjustments, **rest break pause/resume**, **emergency pause** and an event log.
 
 It's plain HTML, CSS and JavaScript, with no server, database or build step. Each display's setup is stored in the part of its link after the `#`, which is never sent to a server.
 
@@ -16,6 +17,7 @@ See **`guide.html`** for the step-by-step guide for staff (it's printable).
 | `index.html`, `js/editor.js`, `css/editor.css` | Library and editor |
 | `display.html`, `js/display.js`, `css/display.css` | The exam hall screen |
 | `js/core.js` | Shared timing, rounding and link logic |
+| `js/csv.js` | Reading CSV files into displays |
 | `guide.html` | Guide for staff |
 | `sw.js` | Offline support (works only on https hosting) |
 

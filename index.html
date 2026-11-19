@@ -25,6 +25,7 @@
 <div class="layout">
   <aside class="sidebar">
     <button class="btn primary block" type="button" data-act="new-display">+ New display</button>
+    <button class="btn block csv-btn" type="button" data-act="import-csv">Create displays from CSV</button>
     <div id="list" class="list" role="list"></div>
     <p class="hint">Displays are saved in this browser. Use <b>Export library</b> to keep a backup or move them to another device.</p>
   </aside>
@@ -60,10 +61,57 @@
   </div>
 </div>
 
+<!-- CSV import dialog -->
+<div id="csvModal" class="modal" hidden>
+  <div class="modal-box wide" role="dialog" aria-modal="true" aria-labelledby="csvTitle">
+    <h2 id="csvTitle">Create displays from a CSV file</h2>
+    <p>Put <b>one exam on each row</b> of a spreadsheet and save it as CSV (in Excel: <i>File &rarr; Save As &rarr; CSV UTF-8</i>).
+      Rows with the same <b>Display</b> name and date go on the same screen. If you leave Display blank, exams are grouped by date, room and morning/afternoon.</p>
+
+    <details class="csv-help">
+      <summary>Columns you can use</summary>
+      <table>
+        <tr><th>Column</th><th>What to put</th></tr>
+        <tr><td>Display</td><td>Optional. A name for the screen, e.g. <i>Tue 18 May AM &ndash; Sports Hall</i>.</td></tr>
+        <tr><td>Date</td><td>e.g. 18/05/2027</td></tr>
+        <tr><td>Room</td><td>e.g. Sports Hall</td></tr>
+        <tr><td>Subject</td><td>e.g. Mathematics Paper 1 (Higher)</td></tr>
+        <tr><td>Board, Paper code</td><td>Optional, e.g. AQA, 8300/1H</td></tr>
+        <tr><td>Start <b>*</b></td><td>24-hour time, e.g. 09:00</td></tr>
+        <tr><td>Duration <b>*</b></td><td>Minutes (90) or hours:minutes (1:30)</td></tr>
+        <tr><td>Extra time</td><td>Extra time percentages, e.g. 25 or 25;50. Leave blank for none. Without this column, +25% is added to every exam.</td></tr>
+        <tr><td>Rest breaks</td><td>Percentages for finish times with rest breaks, e.g. 0 (no extra time) or 25. Leave blank for none.</td></tr>
+        <tr><td>Notes, Centre, Centre number</td><td>Optional. Taken from the first row of each display.</td></tr>
+      </table>
+      <p class="hint"><b>*</b> required. Column headings can be in any order. A normal finish time is always included.</p>
+    </details>
+
+    <div class="btns csv-actions">
+      <button class="btn" type="button" id="csvTemplate">Download template</button>
+      <label class="btn primary" for="csvFile">Choose CSV file&hellip;</label>
+      <input type="file" id="csvFile" accept=".csv,text/csv" class="visually-hidden">
+      <span id="csvFileName" class="hint"></span>
+    </div>
+
+    <div class="grid csv-defaults">
+      <label class="field span-4"><span>Centre name (used when the file leaves it blank)</span><input type="text" id="csvCentre"></label>
+      <label class="field span-2"><span>Centre number</span><input type="text" id="csvCentreNo"></label>
+    </div>
+
+    <div id="csvResult" class="csv-result"></div>
+
+    <div class="btns end">
+      <button class="btn" type="button" id="csvCancel">Cancel</button>
+      <button class="btn primary" type="button" id="csvImport" disabled>Create displays</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="js/core.js"></script>
+<script src="js/csv.js"></script>
 <script src="js/editor.js"></script>
 </body>
 </html>

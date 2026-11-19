@@ -41,7 +41,7 @@
   /* ---------- timing ---------- */
 
   function examName(ex) { return ex.subject || 'Exam'; }
-  function rowName(r) { return r.label || EC.rowLabel(r); }
+  function rowName(ex, r) { return r.label || EC.rowLabel(r, ex); }
 
   function examStart(ex, now) {
     var o = state.starts[ex.id];
@@ -70,6 +70,34 @@
     var pauses = state.emergency.slice();
     if (r.rest) pauses = pauses.concat(breaksFor(ex, r, false));
     return EC.computeFinish(start, EC.allowedMinutes(ex.dur, r.pct), pauses, now);
+  }
+
+  function notStartedExams() {
+    return display.exams.filter(function (ex) { return state.starts[ex.id] == null; });
+  }
+
+  function startAll() {
+    if (preview || !display) return;
+    requestWake();
+    var list = notStartedExams();
+    if (!list.length) return;
+    var all = list.length === display.exams.length;
+    var names = list.length <= 3
+      ? list.map(examName).join(', ')
+      : list.length + ' exams';
+    confirmBox(all ? (list.length === 1 ? 'Start the exam now?' : 'Start all exams now?') : 'Start the remaining exams now?',
+      'The start time for ' + names + ' will be set to the next whole minute (' +
+      EC.fmtHM(Math.ceil(Date.now() / MIN) * MIN) + '), so no candidate loses time. All finish times will update.',
+      'Start now', 'ok',
+      function () {
+        var t = Math.ceil(Date.now() / MIN) * MIN;
+        list.forEach(function (ex) {
+          if (state.starts[ex.id] == null) state.starts[ex.id] = t;
+        });
+        log((all ? 'Start all exams' : 'Start remaining exams') + ' – start time set to ' + EC.fmtHM(t) +
+          ' for ' + list.map(examName).join(', '));
+        commit();
+      });
   }
 
   function currentEmergency() {
@@ -134,7 +162,7 @@
         '<div class="t-row t-start"><span class="t-label">Start</span><span class="t-val"></span></div>';
       ex.rows.forEach(function (r) {
         html += '<div class="t-row' + (r.pct > 0 ? ' t-extra' : '') + (r.rest ? ' t-rest' : '') + '">' +
-          '<span class="t-label">' + EC.esc(rowName(r)) + '<span class="t-tag"></span></span>' +
+          '<span class="t-label">' + EC.esc(rowName(ex, r)) + '<span class="t-tag"></span></span>' +
           '<span class="t-val"></span></div>';
       });
       html += '</div>';
@@ -181,8 +209,8 @@
 
   function tick() {
     var now = Date.now();
-    $('clockHM').textContent = EC.fmtHM(now);
-    $('clockS').textContent = ':' + EC.pad(new Date(now).getSeconds());
+    var hm = EC.fmtHM(now);
+    if ($('clock').textContent !== hm) $('clock').textContent = hm;
     if (display) update(now);
     clearTimeout(tickTimer);
     tickTimer = setTimeout(tick, 1000 - (Date.now() % 1000) + 20);
@@ -198,6 +226,15 @@
     var em = currentEmergency();
     refit = setHidden($('banner'), !em) || refit;
     if (em) $('bannerTime').textContent = EC.fmtElapsed(now - em.s);
+
+    // "Start all exams" stays on screen until every exam has been started.
+    var waiting = notStartedExams();
+    refit = setHidden($('startAllWrap'), !waiting.length) || refit;
+    if (waiting.length) {
+      var label = waiting.length < display.exams.length ? 'Start remaining exams'
+        : display.exams.length === 1 ? 'Start exam' : 'Start all exams';
+      if ($('startAllBtn').textContent !== label) $('startAllBtn').textContent = label;
+    }
 
     var wrongDay = !preview && display.date && display.date !== EC.dateKey(new Date(now));
     refit = setHidden($('dateWarn'), !wrongDay) || refit;
@@ -274,7 +311,7 @@
       ex.rows.forEach(function (r, ri) {
         if (!r.rest) return;
         var open = openBreak(ex, r);
-        h += '<div class="ctl-rest"><div><b>' + EC.esc(rowName(r)) + '</b><br>' +
+        h += '<div class="ctl-rest"><div><b>' + EC.esc(rowName(ex, r)) + '</b><br>' +
           '<span class="muted">Rest breaks so far: <span data-cb="' + ei + '-' + ri + '"></span></span></div>' +
           '<button class="btn ' + (open ? 'warn' : '') + '" type="button" data-act="break" data-ex="' + ei + '" data-row="' + ri + '">' +
           (open ? 'End rest break' : 'Start rest break') + '</button></div>';
@@ -363,14 +400,14 @@
         var open = openBreak(ex, r);
         if (open) {
           open.e = now;
-          log(examName(ex) + ' – ' + rowName(r) + ': rest break ended after ' + EC.fmtElapsed(now - open.s));
+          log(examName(ex) + ' – ' + rowName(ex, r) + ': rest break ended after ' + EC.fmtElapsed(now - open.s));
         } else {
           var start = examStart(ex, now);
           var info = rowInfo(ex, r, start, now);
           if (now < start) { toast('This exam has not started yet.'); return; }
           if (info.finished) { toast('This finish time has already passed.'); return; }
           breaksFor(ex, r, true).push({ s: now, e: null });
-          log(examName(ex) + ' – ' + rowName(r) + ': rest break started');
+          log(examName(ex) + ' – ' + rowName(ex, r) + ': rest break started');
         }
         commit();
         break;
@@ -546,6 +583,7 @@
   });
 
   $('fsBtn').addEventListener('click', function () { requestWake(); goFullscreen(); });
+  $('startAllBtn').addEventListener('click', startAll);
 
   $('controls').addEventListener('click', function (e) {
     bumpCtl();
