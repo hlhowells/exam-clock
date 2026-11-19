@@ -149,7 +149,10 @@
     var n = d.exams.length;
     var cols = n <= 1 ? 1 : n === 2 ? 2 : n === 3 ? 3 : n === 4 ? 2 : 3;
     document.body.classList.toggle('busy', n >= 5);
-    wrap.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(0, 1fr))';
+    // A single exam gets a box only as wide as its contents, centred,
+    // so the times sit close to their labels.
+    document.body.classList.toggle('single', n === 1);
+    wrap.style.gridTemplateColumns = n === 1 ? 'auto' : 'repeat(' + cols + ', minmax(0, 1fr))';
 
     d.exams.forEach(function (ex) {
       var sec = document.createElement('section');
@@ -198,7 +201,7 @@
   }
 
   function overflowing(wrap) {
-    if (wrap.scrollHeight > wrap.clientHeight + 1) return true;
+    if (wrap.scrollHeight > wrap.clientHeight + 1 || wrap.scrollWidth > wrap.clientWidth + 1) return true;
     for (var i = 0; i < cards.length; i++) {
       var el = cards[i].el;
       if (el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1) return true;

@@ -199,6 +199,11 @@ body.busy .start-all-wrap { margin-bottom: 1.6vh; }
 .t-row.stopped .t-tag { background: var(--danger); color: #fff; }
 .exam.all-finished { opacity: .75; }
 
+/* one exam: a centred box sized to its contents */
+body.single .d-exams { justify-content: center; }
+body.single .exam { padding: .55em 1.1em .45em; }
+body.single .t-row { gap: 1.4em; }
+
 .d-notes {
   margin-top: 1.8vh;
   font-size: 2.8vh;
