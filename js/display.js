@@ -154,10 +154,10 @@
     d.exams.forEach(function (ex) {
       var sec = document.createElement('section');
       sec.className = 'exam';
-      var meta = [ex.board, ex.code, EC.fmtDur(ex.dur)].filter(Boolean).join('  ·  ');
+      var meta = [ex.board, ex.code].filter(Boolean).join('  ·  ');
       var html =
         '<div class="exam-subject">' + EC.esc(examName(ex)) + '</div>' +
-        '<div class="exam-meta">' + EC.esc(meta) + '</div>' +
+        (meta ? '<div class="exam-meta">' + EC.esc(meta) + '</div>' : '') +
         '<div class="times">' +
         '<div class="t-row t-start"><span class="t-label">Start</span><span class="t-val"></span></div>';
       ex.rows.forEach(function (r) {
@@ -182,7 +182,8 @@
   // Shrink the exam text until everything fits on screen.
   function fit() {
     var wrap = $('exams');
-    if (!cards.length) return;
+    // Nothing to measure while the page is hidden or has no size yet.
+    if (!cards.length || wrap.clientHeight < 40 || wrap.clientWidth < 40) return;
     // Measure with the cards top-aligned: overflow from centred content
     // isn't counted in scrollHeight.
     wrap.style.alignContent = 'start';
@@ -542,8 +543,20 @@
     }).catch(function () {});
   }
   document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'visible') { requestWake(); tick(); }
+    if (document.visibilityState === 'visible') { requestWake(); tick(); fit(); }
   });
+
+  // Re-fit whenever the exam area changes size (rotation, full screen, toolbars).
+  if (window.ResizeObserver) {
+    var lastSize = '';
+    new ResizeObserver(function () {
+      var w = $('exams'), size = w.clientWidth + 'x' + w.clientHeight;
+      if (size === lastSize) return;
+      lastSize = size;
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(fit, 100);
+    }).observe($('exams'));
+  }
 
   /* ---------- press-and-hold lock button ---------- */
 

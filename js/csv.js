@@ -243,8 +243,16 @@
       ['Tue 18 May PM - Sports Hall', '18/05/2027', 'Sports Hall', 'Biology Paper 1 (Higher)', 'AQA', '8461/1H', '13:30', '1:45', '25', '', '', '', ''],
       ['', '19/05/2027', 'Drama Studio', 'History Paper 1', 'Edexcel', '1HI0/10', '09:00', '75', '25', '0', '', '', '']
     ];
+    return CSV.stringify(lines);
+  };
+
+  // Rows of values -> CSV text that Excel opens with the right characters.
+  CSV.stringify = function (lines) {
     return '﻿' + lines.map(function (l) {
-      return l.map(function (v) { return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(',');
+      return l.map(function (v) {
+        v = String(v == null ? '' : v);
+        return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+      }).join(',');
     }).join('\r\n') + '\r\n';
   };
 

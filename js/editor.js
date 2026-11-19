@@ -550,16 +550,41 @@
 
   /* ---------- export / import ---------- */
 
-  $('exportBtn').addEventListener('click', function () {
-    saveNow();
-    var blob = new Blob([JSON.stringify({ app: 'exam-clock', version: 1, exported: new Date().toISOString(), displays: lib.displays }, null, 2)],
-      { type: 'application/json' });
+  function downloadFile(name, text, type) {
+    var blob = new Blob([text], { type: type });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'exam-clock-library-' + EC.dateKey(new Date()) + '.json';
+    a.download = name;
     document.body.appendChild(a);
     a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+
+  $('exportBtn').addEventListener('click', function () {
+    saveNow();
+    downloadFile('exam-clock-library-' + EC.dateKey(new Date()) + '.json',
+      JSON.stringify({ app: 'exam-clock', version: 1, exported: new Date().toISOString(), displays: lib.displays }, null, 2),
+      'application/json');
+  });
+
+  // A spreadsheet of every display's name and link, e.g. to share with invigilators.
+  $('exportLinksBtn').addEventListener('click', function () {
+    saveNow();
+    if (!lib.displays.length) { toast('There are no displays to export yet.'); return; }
+    if (location.protocol === 'file:' &&
+        !confirm('You are running the library from a file on this computer, so these links will only work on this computer. Export anyway?')) return;
+    var lines = [['Display', 'Date', 'Room', 'Exams', 'Link']];
+    sorted().forEach(function (d) {
+      lines.push([
+        d.name || 'Untitled display',
+        d.date ? EC.fmtDateShort(d.date) : '',
+        d.room,
+        d.exams.map(function (ex) { return ex.start + ' ' + (ex.subject || 'Exam'); }).join('; '),
+        EC.displayUrl(d)
+      ]);
+    });
+    downloadFile('exam-clock-links-' + EC.dateKey(new Date()) + '.csv', EC.csv.stringify(lines), 'text/csv');
+    toast('Exported links for ' + lib.displays.length + ' display' + (lib.displays.length === 1 ? '' : 's') + '.');
   });
 
   $('importFile').addEventListener('change', function () {
