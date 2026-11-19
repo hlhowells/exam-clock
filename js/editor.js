@@ -84,6 +84,11 @@
     if (upcoming.length) h += '<div class="list-group">Upcoming</div>' + upcoming.map(item).join('');
     if (past.length) h += '<div class="list-group">Past</div>' + past.map(item).join('');
     $('list').innerHTML = h;
+    // Only offered while some displays still use light text on black.
+    var dark = lib.displays.filter(function (d) { return d.theme === 'dark'; }).length;
+    $('allLightBtn').hidden = !dark;
+    $('allLightBtn').textContent = 'Use black on white for ' + (dark === lib.displays.length ? 'all ' : '') +
+      dark + ' display' + (dark === 1 ? '' : 's');
   }
 
   $('list').addEventListener('click', function (e) {
@@ -120,8 +125,8 @@
       '<label class="field span-4"><span>Notes shown at the bottom of the screen</span>' +
       '<textarea data-k="notes" rows="2" placeholder="e.g. Mobile phones and smart watches must be handed in.">' + esc(d.notes) + '</textarea></label>' +
       '<label class="field span-2"><span>Screen colours</span><select data-k="theme">' +
-      '<option value="dark"' + (d.theme !== 'light' ? ' selected' : '') + '>Light text on black</option>' +
-      '<option value="light"' + (d.theme === 'light' ? ' selected' : '') + '>Black text on white</option>' +
+      '<option value="light"' + (d.theme !== 'dark' ? ' selected' : '') + '>Black text on white</option>' +
+      '<option value="dark"' + (d.theme === 'dark' ? ' selected' : '') + '>Light text on black</option>' +
       '</select></label>' +
       '</div></section>';
 
@@ -304,6 +309,18 @@
       case 'import-csv':
         openCsv();
         return;
+      case 'all-light': {
+        var darkOnes = lib.displays.filter(function (x) { return x.theme === 'dark'; });
+        if (!darkOnes.length) return;
+        if (!confirm('Change ' + darkOnes.length + ' display' + (darkOnes.length === 1 ? '' : 's') +
+            ' to black text on white?\n\nTheir links change too, so use Export links afterwards to get the new ones.')) return;
+        darkOnes.forEach(function (x) { x.theme = 'light'; x.updated = Date.now(); });
+        saveNow();
+        renderList();
+        renderMain();
+        toast('Changed ' + darkOnes.length + ' display' + (darkOnes.length === 1 ? '' : 's') + ' to black on white.');
+        return;
+      }
       case 'add-exam': {
         var last = d.exams[d.exams.length - 1];
         var ne = EC.newExam(last ? last.start : '09:00');

@@ -204,7 +204,7 @@
   EC.newDisplay = function () {
     return {
       v: 1, id: EC.uid(), name: 'New display', date: EC.dateKey(new Date()),
-      centre: '', centreNo: '', room: '', notes: '', theme: 'dark',
+      centre: '', centreNo: '', room: '', notes: '', theme: 'light',
       exams: [EC.newExam()]
     };
   };
@@ -221,7 +221,7 @@
       centreNo: str(d.centreNo, 20),
       room: str(d.room, 80),
       notes: str(d.notes, 600),
-      theme: d.theme === 'light' ? 'light' : 'dark',
+      theme: d.theme === 'dark' ? 'dark' : 'light',
       exams: []
     };
     if (d.updated) out.updated = +d.updated || 0;

@@ -258,6 +258,7 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
 
 /* CSV import */
 .csv-btn { margin-top: 8px; }
+.all-light { margin-top: 12px; white-space: normal; text-align: center; padding: 6px 10px; }
 .modal-box.wide { max-width: 920px; }
 .modal-box p { margin: 0 0 12px; }
 .csv-help { margin: 0 0 14px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }

@@ -1,16 +1,30 @@
 """Build the Alway Progress Tests pages from an Exam Clock links export.
 
-Usage: python3 -I build.py links.csv OUT_DIR
+Usage: python3 -I build.py links.csv OUT_DIR [light|dark]
 Display names must look like  <Group>_<Day>_<Session>, e.g. Yr7_Mon_1.
+The optional last argument forces every display's screen colours
+(light = black text on white).
 """
+import base64
 import csv
 import html
+import json
 import os
 import re
 import sys
 
 src, out = sys.argv[1], sys.argv[2]
+force_theme = sys.argv[3] if len(sys.argv) > 3 else None
 os.makedirs(out, exist_ok=True)
+
+
+def set_theme(url, theme):
+    """Rewrite the display setup inside a link with different screen colours."""
+    base, _, data = url.partition("#d=")
+    payload = json.loads(base64.urlsafe_b64decode(data + "=" * (-len(data) % 4)).decode("utf-8"))
+    payload["theme"] = theme
+    raw = json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return base + "#d=" + base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
 
 GROUPS = [
     ("Yr7", "year-7.html", "Year 7 Progress Tests"),
@@ -31,7 +45,10 @@ for row in csv.DictReader(open(src, encoding="utf-8-sig")):
     if not day:
         print("skipped (day):", row["Display"])
         continue
-    links.setdefault((group, day), {})[session] = (row["Link"].strip(), row["Date"].strip(), row["Exams"].strip())
+    url = row["Link"].strip()
+    if force_theme:
+        url = set_theme(url, force_theme)
+    links.setdefault((group, day), {})[session] = (url, row["Date"].strip(), row["Exams"].strip())
 
 max_session = max(s for d in links.values() for s in d)
 

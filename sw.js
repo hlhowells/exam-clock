@@ -4,7 +4,7 @@
  * never stops the clock loading) and refreshes the cache in the background.
  * Change CACHE when you publish an update so old copies are replaced.
  */
-var CACHE = 'exam-clock-v5';
+var CACHE = 'exam-clock-v6';
 var FILES = [
   './',
   'index.html',
